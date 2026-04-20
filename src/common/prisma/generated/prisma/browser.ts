@@ -17,4 +17,23 @@ import * as Prisma from './internal/prismaNamespaceBrowser.ts'
 export { Prisma }
 export * as $Enums from './enums.ts'
 export * from './enums.ts';
-
+/**
+ * Model comments
+ * 
+ */
+export type comments = Prisma.commentsModel
+/**
+ * Model images
+ * 
+ */
+export type images = Prisma.imagesModel
+/**
+ * Model saved_images
+ * 
+ */
+export type saved_images = Prisma.saved_imagesModel
+/**
+ * Model users
+ * 
+ */
+export type users = Prisma.usersModel

@@ -8,4 +8,8 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/comments.ts'
+export type * from './models/images.ts'
+export type * from './models/saved_images.ts'
+export type * from './models/users.ts'
 export type * from './commonInputTypes.ts'

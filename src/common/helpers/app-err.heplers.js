@@ -10,7 +10,8 @@ export const appErr = (err, req, res, next) => {
     if (err instanceof jwt.TokenExpiredError) {
         err.code = statusCodes.FORBIDDEN
     }
-    const response = responseError(err?.message, err?.code, err?.stack)
+  //  const response = responseError(err?.message, err?.code, err?.stack)
+    const response = responseError(err?.message, err?.code)
    
     res.status(response.statusCode).json(response);
 };
