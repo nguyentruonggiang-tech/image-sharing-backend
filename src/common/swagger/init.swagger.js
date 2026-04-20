@@ -1,3 +1,5 @@
+import { auth } from "./auth.swagger.js";
+
 export const swaggerDocument = {
     openapi: "3.0.4",
     info: {
@@ -26,6 +28,7 @@ export const swaggerDocument = {
                 200: { description: "Server is running" }
               }
             }
-          }
+        },
+        ...auth,
     },
 };
