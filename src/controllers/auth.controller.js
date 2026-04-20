@@ -18,7 +18,8 @@ export const authController = {
             const result = await authService.login(req);
             res.cookie("accessToken", result.accessToken);
             res.cookie("refreshToken", result.refreshToken);
-            const response = responseSuccess(true, `Đăng nhập thành công`);
+
+            const response = responseSuccess(result, `Đăng nhập thành công`);
             res.status(response.statusCode).json(response);
         } catch (error) {
             next(error);
