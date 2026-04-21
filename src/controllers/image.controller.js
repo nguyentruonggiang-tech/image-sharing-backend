@@ -53,4 +53,30 @@ export const imageController = {
             next(error);
         }
     },
+
+    async saveImage(req, res, next) {
+        try {
+            const result = await imageService.saveImage(req);
+            const response = responseSuccess(
+                result,
+                "Lưu ảnh thành công"
+            );
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            next(error);
+        }
+    },
+    
+    async unsaveImage(req, res, next) {
+        try {
+            const result = await imageService.unsaveImage(req);
+            const response = responseSuccess(
+                result,
+                "Xóa lưu ảnh thành công"
+            );
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            next(error);
+        }
+    },
 };

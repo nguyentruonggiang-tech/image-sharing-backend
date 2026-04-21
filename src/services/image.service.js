@@ -113,4 +113,59 @@ export const imageService = {
             savedAt: row?.createdAt ?? null,
         };
     },
+
+    async saveImage(req) {
+        const imageId = parseImageId(req);
+        await assertImageExists(imageId);
+    
+        const userId = req.user.id;
+    
+        const existed = await prisma.saved_images.findUnique({
+            where: {
+                userId_imageId: { userId, imageId },
+            },
+            select: { createdAt: true },
+        });
+    
+        if (existed) throw new BadRequestException("Image already saved");
+    
+        const created = await prisma.saved_images.create({
+            data: { userId, imageId },
+            select: { createdAt: true },
+        });
+    
+        return {
+            imageId,
+            saved: !!created,
+            savedAt: created?.createdAt ?? null,
+        };
+    },
+    
+    async unsaveImage(req) {
+        const imageId = parseImageId(req);
+        await assertImageExists(imageId);
+    
+        const userId = req.user.id;
+    
+        const existed = await prisma.saved_images.findUnique({
+            where: {
+                userId_imageId: { userId, imageId },
+            },
+            select: { id: true },
+        });
+    
+        if (!existed) throw new NotfoundException("Image not saved");
+    
+        const deleted = await prisma.saved_images.delete({
+            where: {
+                userId_imageId: { userId, imageId },
+            },
+        });
+    
+        return {
+            imageId,
+            saved: !!deleted,
+            savedAt: deleted?.createdAt ?? null,
+        };
+    },
 };
