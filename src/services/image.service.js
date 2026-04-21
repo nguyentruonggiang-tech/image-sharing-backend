@@ -157,7 +157,7 @@ export const imageService = {
     
         if (!existed) throw new NotfoundException("Image not saved");
     
-        const deleted = await prisma.saved_images.delete({
+        await prisma.saved_images.delete({
             where: {
                 userId_imageId: { userId, imageId },
             },
@@ -165,8 +165,8 @@ export const imageService = {
     
         return {
             imageId,
-            saved: !!deleted,
-            savedAt: deleted?.createdAt ?? null,
+            saved: false,
+            savedAt: null
         };
     },
 
@@ -188,8 +188,7 @@ export const imageService = {
         
         return {
             imageId,
-            deleted: !!deleted,
-            deletedAt: deleted?.deletedAt ?? null,
+            deleted: !!deleted
         };
     },
 };
