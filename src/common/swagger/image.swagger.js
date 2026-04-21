@@ -98,6 +98,24 @@ export const image = {
                 },
             },
         },
+        delete: {
+            tags: ["Image"],
+            summary: "Xóa ảnh (chỉ owner, cần đăng nhập)",
+            parameters: [
+                {
+                    name: "imageId",
+                    in: "path",
+                    required: true,
+                    schema: {
+                        type: "integer",
+                        example: 1,
+                    },
+                },
+            ],
+            responses: {
+                200: { description: "Xóa ảnh thành công" }
+            },
+        },
     },
     "/images/{imageId}/saved": {
         get: {
