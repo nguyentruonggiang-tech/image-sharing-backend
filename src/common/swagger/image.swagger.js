@@ -99,4 +99,51 @@ export const image = {
             },
         },
     },
+    "/images/{imageId}/saved": {
+        get: {
+            tags: ["Image"],
+            summary: "Kiểm tra ảnh đã được lưu chưa (cần đăng nhập)",
+            parameters: [
+                {
+                    name: "imageId",
+                    in: "path",
+                    required: true,
+                    schema: { type: "integer", example: 1 },
+                },
+            ],
+            responses: {
+                200: { description: "Lấy trạng thái lưu ảnh thành công" },
+            },
+        },
+        post: {
+            tags: ["Image"],
+            summary: "Lưu ảnh vào danh sách (cần đăng nhập)",
+            parameters: [
+                {
+                    name: "imageId",
+                    in: "path",
+                    required: true,
+                    schema: { type: "integer", example: 1 },
+                },
+            ],
+            responses: {
+                200: { description: "Lưu ảnh thành công" }
+            },
+        },
+        delete: {
+            tags: ["Image"],
+            summary: "Xóa lưu ảnh (cần đăng nhập)",
+            parameters: [
+                {
+                    name: "imageId",
+                    in: "path",
+                    required: true,
+                    schema: { type: "integer", example: 1 },
+                },
+            ],
+            responses: {
+                200: { description: "Xóa lưu ảnh thành công" }
+            },
+        },
+    },
 };
