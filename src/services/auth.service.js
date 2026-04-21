@@ -11,13 +11,13 @@ export const authService = {
             throw new Error("Email, password, fullName are required");
         }
 
-        const userExits = await prisma.users.findUnique({
+        const userExists = await prisma.users.findUnique({
             where: {
                 email: email
             }
         });
 
-        if (userExits) {
+        if (userExists) {
             throw new BadRequestException("Người dùng đã tồn tại. Vui lòng đăng nhập")
         }
 
@@ -38,7 +38,7 @@ export const authService = {
     async login(req) {
         const { email, password} = req.body;
 
-        const userExits = await prisma.users.findUnique({
+        const userExists = await prisma.users.findUnique({
             where: {
                 email: email
             },
@@ -47,24 +47,24 @@ export const authService = {
             }
         });
 
-        if (!userExits) {
+        if (!userExists) {
             throw new UnauthorizedException("Người dùng không tồn tại. Vui lòng đăng ký")
         }
 
-        const isPassword = bcrypt.compareSync(password, userExits.password)
+        const isPassword = bcrypt.compareSync(password, userExists.password)
         if (!isPassword){
             throw new UnauthorizedException("Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại")
         }
 
-        const  accessToken = tokenService.createAccessToken(userExits.id);
-        const  refreshToken = tokenService.createRefreshToken(userExits.id);
+        const  accessToken = tokenService.createAccessToken(userExists.id);
+        const  refreshToken = tokenService.createRefreshToken(userExists.id);
         return {
             accessToken: accessToken,
             refreshToken: refreshToken,
             user: {
-                id: userExits.id,
-                email: userExits.email,
-                fullName: userExits.fullName
+                id: userExists.id,
+                email: userExists.email,
+                fullName: userExists.fullName
             }
         };
     }
