@@ -1,4 +1,6 @@
 import { responseSuccess } from "../common/helpers/response.helpers.js";
+import { userService } from "../services/user.service.js";
+
 export const userController = {
     async getMe(req, res, next) {
         try {
