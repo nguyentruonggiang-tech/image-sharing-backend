@@ -12,5 +12,6 @@ imageRouter.get("/:imageId/saved", protect, imageController.isSaved);
 imageRouter.post("/:imageId/saved", protect, imageController.saveImage);
 imageRouter.delete("/:imageId/saved", protect, imageController.unsaveImage);
 imageRouter.get("/:imageId", imageController.findOne);
+imageRouter.delete("/:imageId", protect, imageController.deleteImage);
 
 export default imageRouter;

@@ -6,6 +6,7 @@ import {
 import {
     BadRequestException,
     NotfoundException,
+    ForbiddenException
 } from "../common/helpers/exception.helpers.js";
 
 function parseImageId(req) {
@@ -166,6 +167,29 @@ export const imageService = {
             imageId,
             saved: !!deleted,
             savedAt: deleted?.createdAt ?? null,
+        };
+    },
+
+    async deleteImage(req) {
+        const imageId = parseImageId(req);
+        const currentUserId = req.user.id;
+        
+        const image = await prisma.images.findUnique({
+            where: { id: imageId },
+            select: { id: true, userId: true },
+        });
+        
+        if (!image) throw new NotfoundException("Image not found");
+        if (image.userId !== currentUserId) {
+            throw new ForbiddenException("You are not allowed to delete this image");
+        }
+        
+        const deleted = await prisma.images.delete({ where: { id: imageId } });
+        
+        return {
+            imageId,
+            deleted: !!deleted,
+            deletedAt: deleted?.deletedAt ?? null,
         };
     },
 };

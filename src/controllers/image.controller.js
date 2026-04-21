@@ -79,4 +79,14 @@ export const imageController = {
             next(error);
         }
     },
+
+    async deleteImage(req, res, next) {
+        try {
+            const result = await imageService.deleteImage(req);
+            const response = responseSuccess(result, "Xóa ảnh thành công");
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            next(error);
+        }
+    },
 };
