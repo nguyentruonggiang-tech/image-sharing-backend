@@ -40,4 +40,17 @@ export const imageController = {
             next(error);
         }
     },
+
+    async isSaved(req, res, next) {
+        try {
+            const result = await imageService.isSaved(req);
+            const response = responseSuccess(
+                result,
+                "Lấy trạng thái lưu ảnh thành công"
+            );
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            next(error);
+        }
+    },
 };

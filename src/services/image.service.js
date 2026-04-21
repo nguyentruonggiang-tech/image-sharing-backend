@@ -8,6 +8,24 @@ import {
     NotfoundException,
 } from "../common/helpers/exception.helpers.js";
 
+function parseImageId(req) {
+    const id = Number(req.params.imageId);
+    if (!Number.isInteger(id) || id < 1) {
+        throw new BadRequestException("Invalid image id");
+    }
+    return id;
+}
+
+async function assertImageExists(imageId) {
+    const image = await prisma.images.findUnique({
+        where: { id: imageId },
+        select: { id: true },
+    });
+    if (!image) {
+        throw new NotfoundException("Image not found");
+    }
+}
+
 async function findImagesPage(where, page, pageSize, index) {
     const [items, totalItem] = await Promise.all([
         prisma.images.findMany({
@@ -74,5 +92,25 @@ export const imageService = {
         }
 
         return image;
+    },
+
+    async isSaved(req) {
+        const imageId = parseImageId(req);
+        await assertImageExists(imageId);
+
+        const userId = req.user.id;
+
+        const row = await prisma.saved_images.findUnique({
+            where: {
+                userId_imageId: { userId, imageId },
+            },
+            select: { id: true, createdAt: true },
+        });
+
+        return {
+            imageId,
+            saved: !!row,
+            savedAt: row?.createdAt ?? null,
+        };
     },
 };
