@@ -5,13 +5,14 @@ import dotenv from "dotenv";
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from "./src/common/swagger/init.swagger.js";
 import { appErr } from "./src/common/helpers/app-err.heplers.js";
+import cookieParse from "cookie-parser";
 
 dotenv.config();
 const app = express();
 
 app.use(cors());
-
 app.use(express.json());
+app.use(cookieParse());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api", rootRouter)
@@ -20,5 +21,5 @@ app.use(appErr)
 
 const PORT = 3069;
 app.listen(PORT, () => {
-  console.log(`Server online at port: ${PORT}`);
+    console.log(`Server online at port: ${PORT}`);
 });
