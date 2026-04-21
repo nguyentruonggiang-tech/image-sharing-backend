@@ -65,4 +65,22 @@ export const auth = {
             },
         },
     },
+    "/auth/refresh-token": {
+        post: {
+            tags: ["Auth"],
+            summary: "Refresh access token bằng cookie refreshToken",
+            responses: {
+                200: { description: "Refresh token thành công" }
+            },
+        },
+    },
+    "/auth/logout": {
+        post: {
+            tags: ["Auth"],
+            summary: "Đăng xuất và xóa cookie token",
+            responses: {
+                200: { description: "Đăng xuất thành công" }
+            },
+        },
+    }
 }
