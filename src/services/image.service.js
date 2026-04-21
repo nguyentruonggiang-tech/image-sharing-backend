@@ -6,8 +6,14 @@ import {
 import {
     BadRequestException,
     NotfoundException,
-    ForbiddenException
+    ForbiddenException,
 } from "../common/helpers/exception.helpers.js";
+import { v2 as cloudinary } from "cloudinary";
+import { CLOUDINARY_IMAGE_FOLDER } from "../common/constant/app.constant.js";
+
+/** Same idea as ExpressJS `user.service.js` top-level cloudinary.config */
+cloudinary.config(true);
+cloudinary.config({ secure: true });
 
 function parseImageId(req) {
     const id = Number(req.params.imageId);
@@ -15,6 +21,38 @@ function parseImageId(req) {
         throw new BadRequestException("Invalid image id");
     }
     return id;
+}
+
+function resolveImageDeliveryUrl(stored) {
+    if (!stored) return stored;
+    if (stored.startsWith("http://") || stored.startsWith("https://")) {
+        return stored;
+    }
+    return cloudinary.url(stored, { secure: true });
+}
+
+function mapImageRow(row) {
+    if (!row) return row;
+    return { ...row, url: resolveImageDeliveryUrl(row.url) };
+}
+
+async function uploadImageToCloudinary(buffer, publicId) {
+    return await new Promise((resolve, reject) => {
+        cloudinary.uploader
+            .upload_stream(
+                {
+                    folder: CLOUDINARY_IMAGE_FOLDER,
+                    public_id: publicId,
+                    overwrite: true,
+                    resource_type: "image",
+                },
+                (error, result) => {
+                    if (error) return reject(error);
+                    return resolve(result);
+                }
+            )
+            .end(buffer);
+    });
 }
 
 async function assertImageExists(imageId) {
@@ -28,7 +66,7 @@ async function assertImageExists(imageId) {
 }
 
 async function findImagesPage(where, page, pageSize, index) {
-    const [items, totalItem] = await Promise.all([
+    const [rows, totalItem] = await Promise.all([
         prisma.images.findMany({
             where,
             skip: index,
@@ -42,7 +80,7 @@ async function findImagesPage(where, page, pageSize, index) {
         totalPage: Math.ceil(totalItem / pageSize),
         page,
         pageSize,
-        items,
+        items: rows.map(mapImageRow),
     };
 }
 
@@ -56,7 +94,8 @@ export const imageService = {
     /** GET /api/images/search  */
     async searchByName(req) {
         const { page, pageSize, index } = parsePaginationFromReq(req);
-        const name = typeof req.query.name === "string" ? req.query.name.trim() : "";
+        const name =
+            typeof req.query.name === "string" ? req.query.name.trim() : "";
 
         if (!name) {
             throw new BadRequestException("Query `name` is required for search");
@@ -68,11 +107,7 @@ export const imageService = {
 
     /** GET /api/images/:imageId */
     async findOne(req) {
-        const id = Number(req.params.imageId);
-
-        if (!Number.isInteger(id) || id < 1) {
-            throw new BadRequestException("Invalid image id");
-        }
+        const id = parseImageId(req);
 
         const image = await prisma.images.findUnique({
             where: { id },
@@ -92,7 +127,7 @@ export const imageService = {
             throw new NotfoundException("Image not found");
         }
 
-        return image;
+        return mapImageRow(image);
     },
 
     async isSaved(req) {
@@ -118,77 +153,140 @@ export const imageService = {
     async saveImage(req) {
         const imageId = parseImageId(req);
         await assertImageExists(imageId);
-    
+
         const userId = req.user.id;
-    
+
         const existed = await prisma.saved_images.findUnique({
             where: {
                 userId_imageId: { userId, imageId },
             },
             select: { createdAt: true },
         });
-    
+
         if (existed) throw new BadRequestException("Image already saved");
-    
+
         const created = await prisma.saved_images.create({
             data: { userId, imageId },
             select: { createdAt: true },
         });
-    
+
         return {
             imageId,
             saved: !!created,
             savedAt: created?.createdAt ?? null,
         };
     },
-    
+
     async unsaveImage(req) {
         const imageId = parseImageId(req);
         await assertImageExists(imageId);
-    
+
         const userId = req.user.id;
-    
+
         const existed = await prisma.saved_images.findUnique({
             where: {
                 userId_imageId: { userId, imageId },
             },
             select: { id: true },
         });
-    
+
         if (!existed) throw new NotfoundException("Image not saved");
-    
+
         await prisma.saved_images.delete({
             where: {
                 userId_imageId: { userId, imageId },
             },
         });
-    
+
         return {
             imageId,
             saved: false,
-            savedAt: null
+            savedAt: null,
         };
     },
 
     async deleteImage(req) {
         const imageId = parseImageId(req);
         const currentUserId = req.user.id;
-        
+
         const image = await prisma.images.findUnique({
             where: { id: imageId },
-            select: { id: true, userId: true },
+            select: { id: true, userId: true, url: true },
         });
-        
+
         if (!image) throw new NotfoundException("Image not found");
         if (image.userId !== currentUserId) {
-            throw new ForbiddenException("You are not allowed to delete this image");
+            throw new ForbiddenException(
+                "You are not allowed to delete this image"
+            );
         }
-        
+
+        if (image.url) {
+            await cloudinary.uploader
+                .destroy(image.url, { invalidate: true })
+                .catch(() => {});
+        }
+
         const deleted = await prisma.images.delete({ where: { id: imageId } });
-        
+
         return {
             imageId,
-            deleted: !!deleted
+            deleted: !!deleted,
         };
+    },
+
+    async create(req) {
+        if (!req.file?.buffer) {
+            throw new BadRequestException("No image file uploaded (field: image)");
+        }
+
+        const imageName =
+            typeof req.body.imageName === "string"
+                ? req.body.imageName.trim()
+                : "";
+        if (!imageName) {
+            throw new BadRequestException("Field `imageName` is required");
+        }
+
+        let description =
+            typeof req.body.description === "string"
+                ? req.body.description.trim()
+                : "";
+        description = description || null;
+
+        const publicId = `img_${Date.now()}_${Math.round(Math.random() * 1e9)}`;
+
+        let uploadResult;
+        try {
+            uploadResult = await uploadImageToCloudinary(
+                req.file.buffer,
+                publicId
+            );
+        } catch (err) {
+            const message =
+                err instanceof Error ? err.message : "Cloudinary upload failed";
+            throw new BadRequestException(message);
+        }
+
+        const created = await prisma.images.create({
+            data: {
+                imageName,
+                description,
+                url: uploadResult.public_id,
+                userId: req.user.id,
+            },
+            include: {
+                users: {
+                    select: {
+                        id: true,
+                        email: true,
+                        fullName: true,
+                        avatar: true,
+                    },
+                },
+            },
+        });
+
+        return mapImageRow(created);
     },
 };

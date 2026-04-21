@@ -89,4 +89,14 @@ export const imageController = {
             next(error);
         }
     },
+
+    async create(req, res, next) {
+        try {
+            const result = await imageService.create(req);
+            const response = responseSuccess(result, "Tạo ảnh thành công");
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
 };

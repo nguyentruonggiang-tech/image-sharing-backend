@@ -6,3 +6,8 @@ export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
 export const ACCESS_EXPIRES_IN = process.env.ACCESS_EXPIRES_IN
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
 export const REFRESH_EXPIRES_IN = process.env.REFRESH_EXPIRES_IN
+
+// Cloudinary
+export const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
+export const CLOUDINARY_IMAGE_FOLDER =
+    process.env.CLOUDINARY_IMAGE_FOLDER || "image-sharing";
