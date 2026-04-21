@@ -46,6 +46,46 @@ export const image = {
                 },
             },
         },
+        post: {
+            tags: ["Image"],
+            summary: "Upload ảnh (cần đăng nhập)",
+            requestBody: {
+                required: true,
+                content: {
+                    "multipart/form-data": {
+                        schema: {
+                            type: "object",
+                            required: ["image", "imageName"],
+                            properties: {
+                                imageName: {
+                                    type: "string"
+                                },
+                                image: {
+                                    type: "string",
+                                    format: "binary",
+                                    description: "File ảnh (image/*)",
+                                },
+                                description: {
+                                    type: "string",
+                                    required: false,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            responses: {
+                200: {
+                    description: "Tạo ảnh thành công — `data.url` là URL HTTPS Cloudinary",
+                },
+                400: {
+                    description: "Thiếu file/imageName, không phải ảnh, hoặc Cloudinary / upload lỗi",
+                },
+                401: {
+                    description: "Chưa đăng nhập hoặc token không hợp lệ",
+                },
+            },
+        },
     },
     "/images/search": {
         get: {
@@ -101,7 +141,15 @@ export const image = {
         delete: {
             tags: ["Image"],
             summary: "Xóa ảnh (chỉ owner, cần đăng nhập)",
+            description: "Xóa bản ghi DB và asset trên Cloudinary (theo `public_id` / URL đã lưu).",
             parameters: [
+                {
+                    name: "accessToken",
+                    in: "cookie",
+                    required: true,
+                    description: "JWT access token",
+                    schema: { type: "string" },
+                },
                 {
                     name: "imageId",
                     in: "path",
@@ -113,7 +161,10 @@ export const image = {
                 },
             ],
             responses: {
-                200: { description: "Xóa ảnh thành công" }
+                200: { description: "Xóa ảnh thành công" },
+                401: { description: "Chưa đăng nhập" },
+                403: { description: "Không phải chủ ảnh" },
+                404: { description: "Không tìm thấy ảnh" },
             },
         },
     },
@@ -122,6 +173,12 @@ export const image = {
             tags: ["Image"],
             summary: "Kiểm tra ảnh đã được lưu chưa (cần đăng nhập)",
             parameters: [
+                {
+                    name: "accessToken",
+                    in: "cookie",
+                    required: true,
+                    schema: { type: "string" },
+                },
                 {
                     name: "imageId",
                     in: "path",
@@ -138,6 +195,12 @@ export const image = {
             summary: "Lưu ảnh vào danh sách (cần đăng nhập)",
             parameters: [
                 {
+                    name: "accessToken",
+                    in: "cookie",
+                    required: true,
+                    schema: { type: "string" },
+                },
+                {
                     name: "imageId",
                     in: "path",
                     required: true,
@@ -152,6 +215,12 @@ export const image = {
             tags: ["Image"],
             summary: "Xóa lưu ảnh (cần đăng nhập)",
             parameters: [
+                {
+                    name: "accessToken",
+                    in: "cookie",
+                    required: true,
+                    schema: { type: "string" },
+                },
                 {
                     name: "imageId",
                     in: "path",
