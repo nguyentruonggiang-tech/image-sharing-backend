@@ -6,5 +6,6 @@ const userRouter = express.Router();
 
 userRouter.use(protect);
 userRouter.get('/me', userController.getMe);
-
+userRouter.get("/me/created-images", userController.getMyCreatedImages);
+userRouter.get("/me/saved-images", userController.getMySavedImages);
 export default userRouter;
