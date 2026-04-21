@@ -1,6 +1,5 @@
 import express from 'express';
 import { authController } from "../controllers/auth.controller.js";
-import { protect } from "../common/middlewares/protect.middlewares.js";
 const authRouter = express.Router();
 
 authRouter.post('/register', authController.register);

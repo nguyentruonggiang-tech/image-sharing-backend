@@ -8,7 +8,7 @@ export const authService = {
         const {email, password, fullName} = req.body;
 
         if (!email || !password || !fullName) {
-            throw new Error("Email, password, fullName are required");
+            throw new BadRequestException("Email, password, fullName bắt buộc");
         }
 
         const userExists = await prisma.users.findUnique({
@@ -18,7 +18,7 @@ export const authService = {
         });
 
         if (userExists) {
-            throw new BadRequestException("Người dùng đã tồn tại. Vui lòng đăng nhập")
+            throw new BadRequestException("Email đã tồn tại. Vui lòng đăng nhập")
         }
 
         const saltRounds = 10;
@@ -32,7 +32,13 @@ export const authService = {
             }
         })
 
-        return userNew;
+        return {
+            user: {
+                id: userNew.id,
+                email: userNew.email,
+                fullName: userNew.fullName
+            }
+        };
     },
 
     async login(req) {
