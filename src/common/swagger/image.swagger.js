@@ -168,12 +168,6 @@ export const image = {
             summary: "Kiểm tra ảnh đã được lưu chưa (cần đăng nhập)",
             parameters: [
                 {
-                    name: "accessToken",
-                    in: "cookie",
-                    required: true,
-                    schema: { type: "string" },
-                },
-                {
                     name: "imageId",
                     in: "path",
                     required: true,
@@ -189,12 +183,6 @@ export const image = {
             summary: "Lưu ảnh vào danh sách (cần đăng nhập)",
             parameters: [
                 {
-                    name: "accessToken",
-                    in: "cookie",
-                    required: true,
-                    schema: { type: "string" },
-                },
-                {
                     name: "imageId",
                     in: "path",
                     required: true,
@@ -209,12 +197,6 @@ export const image = {
             tags: ["Image"],
             summary: "Xóa lưu ảnh (cần đăng nhập)",
             parameters: [
-                {
-                    name: "accessToken",
-                    in: "cookie",
-                    required: true,
-                    schema: { type: "string" },
-                },
                 {
                     name: "imageId",
                     in: "path",
