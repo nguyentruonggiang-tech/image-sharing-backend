@@ -6,7 +6,7 @@ import imageRouter from "./image.router.js";
 const rootRouter = express.Router()
 
 rootRouter.get("/health", (req, res) => {
-    return res.status(200).json({ success: true, message: "Server is running" });
+    return res.status(200).json({ success: true, message: "Server đang hoạt động" });
 });
 
 rootRouter.use("/auth", authRouter);

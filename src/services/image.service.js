@@ -11,14 +11,14 @@ import {
 import { v2 as cloudinary } from "cloudinary";
 import { CLOUDINARY_IMAGE_FOLDER } from "../common/constant/app.constant.js";
 
-/** Same idea as ExpressJS `user.service.js` top-level cloudinary.config */
+/** Cấu hình Cloudinary tương tự ExpressJS `user.service.js` */
 cloudinary.config(true);
 cloudinary.config({ secure: true });
 
 function parseImageId(req) {
     const id = Number(req.params.imageId);
     if (!Number.isInteger(id) || id < 1) {
-        throw new BadRequestException("Invalid image id");
+        throw new BadRequestException("Id ảnh không hợp lệ");
     }
     return id;
 }
@@ -61,7 +61,7 @@ async function assertImageExists(imageId) {
         select: { id: true },
     });
     if (!image) {
-        throw new NotfoundException("Image not found");
+        throw new NotfoundException("Không tìm thấy ảnh");
     }
 }
 
@@ -98,7 +98,7 @@ export const imageService = {
             typeof req.query.name === "string" ? req.query.name.trim() : "";
 
         if (!name) {
-            throw new BadRequestException("Query `name` is required for search");
+            throw new BadRequestException("Thiếu từ khóa `name` để tìm kiếm");
         }
 
         const where = { imageName: { contains: name } };
@@ -124,7 +124,7 @@ export const imageService = {
         });
 
         if (!image) {
-            throw new NotfoundException("Image not found");
+            throw new NotfoundException("Không tìm thấy ảnh");
         }
 
         return mapImageRow(image);
@@ -163,7 +163,7 @@ export const imageService = {
             select: { createdAt: true },
         });
 
-        if (existed) throw new BadRequestException("Image already saved");
+        if (existed) throw new BadRequestException("Ảnh đã được lưu trước đó");
 
         const created = await prisma.saved_images.create({
             data: { userId, imageId },
@@ -190,7 +190,7 @@ export const imageService = {
             select: { id: true },
         });
 
-        if (!existed) throw new NotfoundException("Image not saved");
+        if (!existed) throw new NotfoundException("Ảnh chưa được lưu");
 
         await prisma.saved_images.delete({
             where: {
@@ -214,11 +214,10 @@ export const imageService = {
             select: { id: true, userId: true, url: true },
         });
 
-        if (!image) throw new NotfoundException("Image not found");
+        if (!image) throw new NotfoundException("Không tìm thấy ảnh");
         if (image.userId !== currentUserId) {
             throw new ForbiddenException(
                 "Bạn không có quyền xóa ảnh này"
-           
             );
         }
 
@@ -238,7 +237,7 @@ export const imageService = {
 
     async create(req) {
         if (!req.file?.buffer) {
-            throw new BadRequestException("No image file uploaded (field: image)");
+            throw new BadRequestException("Chưa upload file ảnh (field: image)");
         }
 
         const imageName =
@@ -246,7 +245,7 @@ export const imageService = {
                 ? req.body.imageName.trim()
                 : "";
         if (!imageName) {
-            throw new BadRequestException("Field `imageName` is required");
+            throw new BadRequestException("Thiếu trường `imageName`");
         }
 
         let description =
@@ -265,7 +264,7 @@ export const imageService = {
             );
         } catch (err) {
             const message =
-                err instanceof Error ? err.message : "Cloudinary upload failed";
+                err instanceof Error ? err.message : "Upload Cloudinary thất bại";
             throw new BadRequestException(message);
         }
 
