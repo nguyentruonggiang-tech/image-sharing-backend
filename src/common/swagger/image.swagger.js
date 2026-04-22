@@ -76,14 +76,8 @@ export const image = {
             },
             responses: {
                 200: {
-                    description: "Tạo ảnh thành công — `data.url` là URL HTTPS Cloudinary",
-                },
-                400: {
-                    description: "Thiếu file/imageName, không phải ảnh, hoặc Cloudinary / upload lỗi",
-                },
-                401: {
-                    description: "Chưa đăng nhập hoặc token không hợp lệ",
-                },
+                    description: "Tạo ảnh thành công",
+                }
             },
         },
     },
