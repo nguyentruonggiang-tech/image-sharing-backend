@@ -12,14 +12,13 @@ export const swaggerDocument = {
     },
     servers: [
         {
-            url: "http://localhost:3069/api",
+            url: "https://image-sharing.up.railway.app/api",
             description: "Optional server description, e.g. Main (production) server",
         },
         {
-            url: "http://staging-api.example.com",
-            description:
-                "Optional server description, e.g. Internal staging server for testing",
-        },
+            url: "http://localhost:3069/api",
+            description: "Optional server description, e.g. Local (production) server",
+        }
     ],
     paths: {
         "/health": {
