@@ -148,10 +148,7 @@ export const image = {
                 },
             ],
             responses: {
-                200: { description: "Xóa ảnh thành công" },
-                401: { description: "Chưa đăng nhập" },
-                403: { description: "Không phải chủ ảnh" },
-                404: { description: "Không tìm thấy ảnh" },
+                200: { description: "Xóa ảnh thành công" }
             },
         },
     },

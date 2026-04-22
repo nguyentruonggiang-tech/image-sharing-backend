@@ -217,7 +217,8 @@ export const imageService = {
         if (!image) throw new NotfoundException("Image not found");
         if (image.userId !== currentUserId) {
             throw new ForbiddenException(
-                "You are not allowed to delete this image"
+                "Bạn không có quyền xóa ảnh này"
+           
             );
         }
 
