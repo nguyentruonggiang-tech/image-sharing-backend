@@ -138,13 +138,6 @@ export const image = {
             description: "Xóa bản ghi DB và asset trên Cloudinary (theo `public_id` / URL đã lưu).",
             parameters: [
                 {
-                    name: "accessToken",
-                    in: "cookie",
-                    required: true,
-                    description: "JWT access token",
-                    schema: { type: "string" },
-                },
-                {
                     name: "imageId",
                     in: "path",
                     required: true,
