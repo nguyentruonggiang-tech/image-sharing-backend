@@ -8,7 +8,7 @@ import { buildQueryPrimsa } from "../common/helpers/build-query-primsa.helper.js
 function parseImageId(req) {
     const id = Number(req.params.imageId);
     if (!Number.isInteger(id) || id < 1) {
-        throw new BadRequestException("Invalid image id");
+        throw new BadRequestException("Id ảnh không hợp lệ");
     }
     return id;
 }
@@ -19,7 +19,7 @@ async function assertImageExists(imageId) {
         select: { id: true },
     });
     if (!image) {
-        throw new NotfoundException("Image not found");
+        throw new NotfoundException("Không tìm thấy ảnh");
     }
 }
 
@@ -62,7 +62,7 @@ export const commentService = {
 
         const { content } = req.body;
         if (typeof content !== "string" || !content.trim()) {
-            throw new BadRequestException("Content is required");
+            throw new BadRequestException("Thiếu nội dung bình luận");
         }
 
         const created = await prisma.comments.create({

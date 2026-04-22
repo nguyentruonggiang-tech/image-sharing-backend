@@ -5,28 +5,28 @@ import { comment } from "./comment.swagger.js";
 export const swaggerDocument = {
     openapi: "3.0.4",
     info: {
-        title: "Sample API",
+        title: "API chia sẻ ảnh",
         description:
-            "Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.",
+            "Tài liệu API cho dự án học tập chia sẻ ảnh.",
         version: "0.1.9",
     },
     servers: [
         {
             url: "https://image-sharing.up.railway.app/api",
-            description: "Optional server description, e.g. Main (production) server",
+            description: "Máy chủ chính (production)",
         },
         {
             url: "http://localhost:3069/api",
-            description: "Optional server description, e.g. Local (production) server",
+            description: "Máy chủ local (phát triển)",
         }
     ],
     paths: {
         "/health": {
             get: {
               tags: ["Health"],
-              summary: "Health check",
+              summary: "Kiểm tra trạng thái server",
               responses: {
-                200: { description: "Server is running" }
+                200: { description: "Server đang hoạt động" }
               }
             }
         },
